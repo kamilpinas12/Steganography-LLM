@@ -1,0 +1,6 @@
+{
+  "prompt": "Once upon a time ",
+  "secret": "X",
+  "password": "mypassword123",
+  "message_file": "data/message.json"
+}
