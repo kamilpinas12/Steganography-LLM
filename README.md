@@ -8,6 +8,9 @@ System uwzględnia tajne wiadomości w naturalnej tekście generowanego przez mo
 
 - **encoder.py** - Enkoder: generuje zakodowana wiadomosc i zapisuje do `data/message.json`
 - **decoder.py** - Dekoder: wczytuje `data/message.json`, odtwarza sekret i zapisuje go do `data/decoded_message.json`
+- **app.py** - Aplikacja GUI (Qt for Python), laczy interfejs QML z funkcjami enkodera/dekodera
+- **AppUI.qml** + `components/` - Widoki GUI (ustawienia, kodowanie, dekodowanie, terminal logow)
+- **PYQT_README.md** - Krotki opis uruchomienia i ukladu interfejsu GUI
 - **data/config.json** - Wspolny config dla enkodera i dekodera (`threshold`, `top_n`, domyslne nazwy plikow)
 - **data/input.json** - Wejscie z GUI/uzytkownika (`prompt`, `secret`, `password`, opcjonalnie `message_file`)
 - **data/message.json** - Wyjscie enkodera (steganograficzna wiadomosc)
@@ -39,6 +42,20 @@ System uwzględnia tajne wiadomości w naturalnej tekście generowanego przez mo
 4. Wypisuje zdekodowany sekret
 
 ## Użycie
+
+### GUI (Qt)
+
+Uruchom interfejs graficzny:
+
+```bash
+python app.py
+```
+
+W GUI mozesz ustawic `prompt`, `secret`, `password`, `threshold`, `eos_threshold` i `top_n`, a nastepnie uruchomic:
+- **Generate\_Encode** - zapisuje wynik do `data/message.json`
+- **Decode Secret** - odczytuje sekret i zapisuje go do `data/decoded_message.json`
+
+Szczegoly interfejsu sa opisane w [PYQT_README.md](PYQT_README.md).
 
 ### Encoding (generowanie stenografii)
 
@@ -153,11 +170,18 @@ Przykladowy zapis wyjscia dekodera [data/decoded_message.json](data/decoded_mess
 
 - PyTorch (`torch`)
 - Transformers (`transformers`)
+- PySide6 (`PySide6`) - dla GUI
 - Python 3.8+
 
 Zainstaluj:
 ```bash
 pip install torch transformers
+```
+
+lub (zalecane, wszystkie zaleznosci projektu):
+
+```bash
+pip install -r requirements.txt
 ```
 
 ## Techniczne detale
@@ -190,6 +214,4 @@ pip install torch transformers
 - [x] Algorytm dekodowania bitów z tokenów
 - [x] Obsługa EOM markera
 - [x] JSON I/O
-- [ ] GUI interfejs
-- [ ] Optymalizacja pojemności (lepszy selection algorytm)
-- [ ] Wsparcie dla innych modeli
+- [x] GUI interfejs
