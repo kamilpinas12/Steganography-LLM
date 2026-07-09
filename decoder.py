@@ -95,64 +95,60 @@ def bits_to_string(bits: list) -> str:
 
 def decode(input_file: str, password: str, threshold: float = 0.0, top_n: int = 10) -> str:
     """Decode secret message from JSON file."""
-    
-    # Load JSON
+
     with open(input_file, "r") as f:
         data = json.load(f)
-    
+
     prompt = data["prompt"]
     token_ids = data["token_ids"]
-    
+
     print(f"Loaded {input_file}")
     print(f"Prompt: {repr(prompt)}")
     print(f"Total tokens: {len(token_ids)}")
-    
-    # Initialize PRNG with same deterministic seed as encoder
+
     seed = seed_from_password(password)
     random.seed(seed)
     torch.manual_seed(seed % (2**31))
-    
-    # Initialize context
-    input_ids = tokenizer(prompt, return_tensors="pt").input_ids.to(DEVICE)
-    
+
+    prompt_token_ids = tokenizer(prompt, return_tensors="pt").input_ids[0].tolist()
+    stego_token_ids = token_ids[len(prompt_token_ids):]
+
+    print(f"\nStarting decoding with threshold={threshold}, top_n={top_n}...")
+    print(f"Stego tokens to process: {len(stego_token_ids)}")
+
+    full_input_ids = torch.tensor([token_ids], dtype=torch.long, device=DEVICE)
+    with torch.no_grad():
+        outputs = model(input_ids=full_input_ids)
+    all_logits = outputs.logits
+
+    print("Single forward pass complete (teacher forcing on full sequence).")
+
     decoded_bits = []
     eom_reached = False
-    
-    print(f"\nStarting decoding with threshold={threshold}, top_n={top_n}...")
-    
-    # Process each token in token_ids (skip the prompt tokens)
-    prompt_token_ids = input_ids[0].tolist()
-    token_ids_to_process = token_ids[len(prompt_token_ids):]
-    
-    for step, target_token_id in enumerate(token_ids_to_process, start=1):
-        
-        with torch.no_grad():
-            outputs = model(input_ids=input_ids)
-            logits = outputs.logits[0, -1, :]
-            probs = torch.softmax(logits, dim=-1)
-        
-        # Get top_n tokens
+
+    for step, target_token_id in enumerate(stego_token_ids, start=1):
+        pos_in_full = len(prompt_token_ids) + step - 1
+        logits = all_logits[0, pos_in_full - 1, :]
+        probs = torch.softmax(logits, dim=-1)
+
         top_k = torch.topk(probs, min(top_n, len(probs)))
         top_indices = top_k.indices.tolist()
         top_probs = top_k.values.tolist()
         top_prob_by_id = {token_id: prob for token_id, prob in zip(top_indices, top_probs)}
-        
-        # Filter by threshold
+
         safe_tokens = []
         safe_probs = []
         for token_id, prob in zip(top_indices, top_probs):
             if prob >= threshold:
                 safe_tokens.append(token_id)
                 safe_probs.append(prob)
-        
-        # Remove EOS token if not at EOM yet
+
         if not eom_reached:
             if tokenizer.eos_token_id in safe_tokens:
                 idx = safe_tokens.index(tokenizer.eos_token_id)
                 safe_tokens.pop(idx)
                 safe_probs.pop(idx)
 
-        # Show where the selected token is in the probability list.
         selected_token_raw = tokenizer.convert_ids_to_tokens(target_token_id)
         selected_token_text = tokenizer.decode([target_token_id], skip_special_tokens=False)
         if target_token_id in top_indices:
@@ -167,66 +163,56 @@ def decode(input_file: str, password: str, threshold: float = 0.0, top_n: int = 
                 f"Step {step}: selected token {target_token_id} raw={repr(selected_token_raw)} "
                 f"text={repr(selected_token_text)} is outside TOP-{top_n}"
             )
-        
+
         if len(safe_tokens) == 0:
             print(f"Step {step}: No safe tokens available, stopping.")
             break
-        
-        # Determine capacity
+
         capacity = largest_power_of_2(len(safe_tokens))
-        # Find k such that 2^k = capacity
         k = 0
         while 2 ** k < capacity:
             k += 1
-        
-        # Trim to capacity and shuffle
+
         safe_tokens = safe_tokens[:capacity]
-        
+
         shuffled_indices = list(range(len(safe_tokens)))
         random.shuffle(shuffled_indices)
         shuffled_tokens = [safe_tokens[i] for i in shuffled_indices]
-        
-        # Find position of actual token in shuffled list
+
         if target_token_id in shuffled_tokens:
             position = shuffled_tokens.index(target_token_id)
-            
-            # Extract bits from position
+
             if capacity > 1:
                 bits_extracted = int_to_bits(position, k)
                 decoded_bits.extend(bits_extracted)
-                
-                # Check if we have enough bits to decode a character and detect EOM
+
                 decoded_string = bits_to_string(decoded_bits)
                 if len(decoded_string) > 0 and decoded_string[-1] == "\x04":
                     eom_reached = True
         else:
             print(f"Step {step}: Token {target_token_id} not in shuffled list!")
-        
-        # Add token to context for next iteration
-        chosen_tensor = torch.tensor([[target_token_id]], device=DEVICE)
-        input_ids = torch.cat([input_ids, chosen_tensor], dim=1)
-        
+
         token_str = tokenizer.convert_ids_to_tokens(target_token_id)
         if step % 5 == 0 or eom_reached:
             current_decoded = bits_to_string(decoded_bits)
-            print(f"Step {step}: Token {target_token_id:5d} ({repr(token_str):20s}), bits_decoded={sum(1 for _ in decoded_bits)}, chars={len(current_decoded)}")
-        
+            print(
+                f"Step {step}: Token {target_token_id:5d} ({repr(token_str):20s}), "
+                f"bits_decoded={len(decoded_bits)}, chars={len(current_decoded)}"
+            )
+
         if eom_reached:
             print(f"Step {step}: EOM marker reached!")
             break
-    
-    # Final decode
+
     secret = bits_to_string(decoded_bits)
-    
-    # Remove EOM marker if present
+
     if secret.endswith("\x04"):
         secret = secret[:-1]
-    
-    # Remove any trailing incomplete characters
+
     print(f"\nDecoding complete!")
     print(f"Decoded bits: {len(decoded_bits)}")
     print(f"Decoded secret: {repr(secret)}")
-    
+
     return secret
 
 
