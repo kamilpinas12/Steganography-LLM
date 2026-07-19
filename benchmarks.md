@@ -21,7 +21,7 @@ Ten dokument definiuje niezbędne minimum testów potrzebnych do ewaluacji metod
 
 - **Metryka:** HumanEval (Pass@1).
 - **Co bada:** Czy model po narzuceniu restrykcji steganograficznych (np. ucięciu najlepszych tokenów przez `threshold`) wciąż potrafi poprawnie rozwiązywać problemy logiczne i programistyczne.
-- **Status:** Zaimplementowane w `run_experiments.py --test humaneval`.
+- **Status:** Zaimplementowane w `run_experiments.py --test humaneval`. Notebook Colab: `colab/Colab_Runner.ipynb`.
 
 ## 4. Bezpieczeństwo i Niewykrywalność (Security & Undetectability)
 

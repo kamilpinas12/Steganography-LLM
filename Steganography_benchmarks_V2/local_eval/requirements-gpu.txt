@@ -1,0 +1,3 @@
+-r ../requirements.txt
+
+# GPU eval: perplexity (benchmark model) + binoculars (Falcon)

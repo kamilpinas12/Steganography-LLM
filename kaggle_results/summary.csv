@@ -1,0 +1,1 @@
+Timestamp,Run_Dir,Test,Model_Key,Model_ID,Threshold,Top_N,Pass@1,Perplexity,Baseline_Perplexity,Perplexity_Delta,Avg_Pool_Size,Avg_Pool_Size_Stego_Only,Avg_BPT,Embedding_Rate,Total_Generation_Steps,Stego_Steps,Natural_Fallback_Steps,Binoculars_Score,Baseline_Binoculars_Score,Binoculars_Score_Delta,AI_Detection_Rate,Baseline_AI_Detection_Rate
