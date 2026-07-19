@@ -1,13 +1,5 @@
-torch>=2.3.0
-transformers>=4.44.0
-accelerate>=0.33.0
-bitsandbytes>=0.43.1
-sentencepiece>=0.2.0
-protobuf>=5.27.0
-datasets>=2.20.0
-evaluate>=0.4.2
-human-eval>=1.0.3
-tqdm>=4.66.0
-numpy>=1.26.0
-huggingface-hub>=0.24.0
-PyQt6>=6.6.0
+# GUI demo
+-r gui/requirements.txt
+
+# Benchmarki V2 (opcjonalnie)
+# -r Steganography_benchmarks_V2/scripts/requirements.txt

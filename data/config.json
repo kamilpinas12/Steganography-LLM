@@ -1,7 +1,0 @@
-{
-  "threshold": 0.1,
-  "eos_threshold": 0.01,
-  "top_n": 16,
-  "message_file": "data/message.json",
-  "decoded_message_file": "data/decoded_message.json"
-}

@@ -1,6 +1,10 @@
 /.vscode
-__pycache__
-venv
-models
-models_cache
-results
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+models/
+models_cache/
+*.egg-info/
+.ipynb_checkpoints/

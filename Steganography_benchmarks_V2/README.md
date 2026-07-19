@@ -1,65 +1,38 @@
-# Steganography Benchmarks V2
+# Benchmarki V2
 
-Dwuetapowy pipeline: **generacja RAW (Kaggle/Colab)** → **ewaluacja (lokalnie lub GPU)**.
+```
+Steganography_benchmarks_V2/
+  *.ipynb          # notebooki Colab/Kaggle
+  runs/            # wyjście generacji na platformie
+  scripts/         # kod Pythona (generate / evaluate)
+  results/         # lokalne runy + eksport CSV per benchmark
+```
 
-## Benchmarki
+## Testy
 
-| Test | Generacja (GPU) | Ewaluacja | Zapisuje (RAW) |
-|------|-----------------|-----------|----------------|
-| **humaneval** | 164 zadań | CPU | `raw_completion`, prompt, capacity per task |
-| **perplexity** | 4 prompty × baseline+stego | **GPU** (model benchmarku) | pełne teksty baseline/stego, capacity |
-| **capacity** | 4 prompty | **CPU** | teksty + capacity per prompt |
-| **binoculars** | 4 prompty × baseline+stego | **GPU** (Falcon 7B) | teksty baseline/stego, capacity |
+| Test | Generacja | Ewaluacja |
+|------|-----------|-----------|
+| `humaneval` | GPU | CPU |
+| `capacity` | GPU | CPU |
+| `perplexity` | GPU | GPU |
+| `binoculars` | GPU | GPU (Falcon) |
 
-Thresholdy: **0.0, 0.01, 0.05, 0.1** — osobny run na każdy.
-
-## Generacja
+## CLI
 
 ```bash
-python generate_responses.py \
-  --test perplexity \
-  --model llama \
-  --threshold 0.01 \
-  --platform kaggle
+python scripts/generate_responses.py --test capacity --model qwen --threshold 0.01 --platform kaggle
+python scripts/evaluate_responses.py --run-dir runs/NAZWA_RUNU
 ```
 
-Testy: `humaneval` | `perplexity` | `capacity` | `binoculars`
+## Lokalne wyniki
 
-## Ewaluacja
+Skopiuj run do `results/<benchmark>/runs/`, potem:
 
 ```bash
-python evaluate_responses.py --run-dir runs/NAZWA_RUNU
+cd results
+python run_evaluate.py --list
+python run_evaluate.py NAZWA_RUNU
+python humaneval/export_csv.py   # → humaneval/summary.csv
 ```
 
-Wyniki w `runs/.../evaluation/`:
-- `samples_detail.json` — surowe dane per próbka
-- `*_results.json` — metryki + pełne sample z score
-- `summary.csv` — jedna linia per run
-
-## Struktura runu (perplexity / binoculars)
-
-```json
-{
-  "sample_id": "perplexity/0",
-  "user_prompt": "...",
-  "prompt_text": "...",
-  "baseline": {
-    "raw_full_decoded": "...",
-    "raw_completion": "..."
-  },
-  "stego": {
-    "raw_full_decoded": "...",
-    "raw_completion": "...",
-    "capacity": { "avg_pool_size": 3.2, ... }
-  }
-}
-```
-
-## Lokalna ewaluacja
-
-- **humaneval + capacity** → `local_eval/requirements.txt` (CPU)
-- **perplexity + binoculars** → dodatkowo `pip install -r local_eval/requirements-gpu.txt` + GPU
-
-Szczegóły: [`local_eval/README.md`](local_eval/README.md)
-
-V1 (`Steganography_colab/`) bez zmian.
+Szczegóły: [`results/README.md`](results/README.md).

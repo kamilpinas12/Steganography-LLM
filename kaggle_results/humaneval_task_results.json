@@ -1,8 +1,0 @@
-[
-  {
-    "task_id": "HumanEval/102",
-    "passed": false,
-    "result": "failed: ",
-    "completion": "    for i in range(x, y + 1):\n      if i % 2 == 0 and i >= x and i <= y:\n        return i\n    return -1"
-  }
-]

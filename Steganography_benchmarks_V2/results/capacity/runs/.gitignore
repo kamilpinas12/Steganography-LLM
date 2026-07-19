@@ -1,0 +1,4 @@
+# Ignoruj dane runów (jsonl bywa duży) — trzymaj tylko strukturę folderu w repo
+*
+!.gitignore
+!.gitkeep
