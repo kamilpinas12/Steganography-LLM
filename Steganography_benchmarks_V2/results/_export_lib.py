@@ -1,4 +1,4 @@
-"""Wspólne spłaszczanie JSON → wiersz CSV (jeden run = jeden wiersz)."""
+"""Flatten JSON → CSV row (one run = one row)."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-# Listy / duże struktury — nie trafiają do CSV (zostają w JSON runu).
+# Lists / large structures — stay in the run JSON, not in CSV.
 SKIP_KEYS = {
     "completed_task_ids",
     "humaneval_tasks",
@@ -22,7 +22,7 @@ def _is_scalar(value: Any) -> bool:
 
 
 def flatten_mapping(data: dict[str, Any], *, prefix: str = "") -> dict[str, Any]:
-    """Spłaszcza dict: zagnieżdżone dicty → prefix_klucz; listy pomija."""
+    """Flatten nested dicts to prefix_key; skip lists."""
     out: dict[str, Any] = {}
     for key, value in data.items():
         if key in SKIP_KEYS:
@@ -40,7 +40,7 @@ def load_json(path: Path) -> dict[str, Any]:
 
 
 def collect_run_row(run_dir: Path, results_name: str) -> dict[str, Any] | None:
-    """Manifest + evaluation/<results_name> → jeden spłaszczony wiersz (bez prefiksów)."""
+    """Manifest + evaluation/<results_name> → one flattened row (no prefixes)."""
     results_path = run_dir / "evaluation" / results_name
     if not results_path.is_file():
         return None
@@ -51,7 +51,7 @@ def collect_run_row(run_dir: Path, results_name: str) -> dict[str, Any] | None:
     if manifest_path.is_file():
         row.update(flatten_mapping(load_json(manifest_path)))
 
-    # wyniki nadpisują ewentualne kolizje nazw z manifestu (np. test)
+    # Results overwrite any name collisions with the manifest (e.g. test).
     row.update(flatten_mapping(load_json(results_path)))
     return row
 
@@ -71,7 +71,7 @@ def export_benchmark_csv(
 
     if not rows:
         out_csv.write_text("", encoding="utf-8")
-        print(f"Brak runów z {results_filename} w {runs_dir} → pusty {out_csv}")
+        print(f"No runs with {results_filename} in {runs_dir} → empty {out_csv}")
         return 0
 
     columns: list[str] = []
@@ -100,5 +100,5 @@ def export_benchmark_csv(
         writer.writeheader()
         writer.writerows(rows)
 
-    print(f"Zapisano {len(rows)} wierszy, {len(ordered)} kolumn → {out_csv}")
+    print(f"Wrote {len(rows)} rows, {len(ordered)} columns → {out_csv}")
     return len(rows)

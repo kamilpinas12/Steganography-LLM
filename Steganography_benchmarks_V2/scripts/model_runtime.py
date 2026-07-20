@@ -14,7 +14,8 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 from dummy_processor import StegoCapacityStats, make_stego_logits_processor
 
-REPO_ROOT = Path(__file__).resolve().parent
+SCRIPTS_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPTS_DIR.parent  # Steganography_benchmarks_V2/
 MODEL_CACHE_ROOT = REPO_ROOT / "models_cache"
 OFFLINE_MODE = False
 NO_PERSISTENT_CACHE = False

@@ -1,6 +1,6 @@
-# Wyniki lokalne
+# Local results
 
-Każdy benchmark ma własny folder: runy + `export_csv.py` → `summary.csv` z **wszystkimi** polami skalarnymi (manifest + wyniki). Nie ma wspólnego CSV dla wszystkich testów.
+Each benchmark has its own folder: runs + `export_csv.py` → `summary.csv` with **all** scalar fields (manifest + metrics). There is no shared CSV across test types.
 
 ```
 results/
@@ -13,16 +13,42 @@ results/
 
 ## Setup
 
+From `Steganography_benchmarks_V2/results/`:
+
 ```bash
 python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt          # humaneval, capacity
-pip install -r requirements-gpu.txt      # + perplexity, binoculars
+
+# CPU (humaneval, capacity)
+pip install -r requirements.txt
+
+# GPU (perplexity, binoculars) — torch, transformers, bitsandbytes
+pip install -r requirements-gpu.txt
+```
+
+Or in one step (from `results/`):
+
+```bash
+pip install -r ../scripts/requirements.txt
 ```
 
 ## Workflow
 
-1. Skopiuj folder runu → `results/<benchmark>/runs/`
-2. `python run_evaluate.py NAZWA_RUNU` (jeśli brak `evaluation/`)
+1. Copy the run folder → `results/<benchmark>/runs/`
+2. `python run_evaluate.py RUN_NAME` (if `evaluation/` is missing)
 3. `python <benchmark>/export_csv.py`
 
-Kolumny w CSV: parametry runu + metryki (spłaszczone, bez prefiksów). Listy próbek zostają w JSON.
+CSV columns: run parameters + metrics (flattened, no prefixes). Sample lists stay in JSON.
+
+## Perplexity (missing evaluation)
+
+```bash
+export HF_TOKEN="hf_..."   # llama / gemma
+cd Steganography_benchmarks_V2/results
+source .venv/bin/activate
+
+for run in perplexity/runs/*/; do
+  python run_evaluate.py "$(basename "$run")"
+done
+
+python perplexity/export_csv.py
+```

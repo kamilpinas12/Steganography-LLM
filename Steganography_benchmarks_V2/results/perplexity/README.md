@@ -4,5 +4,5 @@
 python export_csv.py   # → summary.csv
 ```
 
-Źródło: `runs/*/evaluation/perplexity_results.json` (+ `manifest.json`).
-Wymaga wcześniejszej ewaluacji GPU (`run_evaluate.py` / `--eval-after`).
+Source: `runs/*/evaluation/perplexity_results.json` (+ `manifest.json`).
+Requires a prior GPU evaluation (`run_evaluate.py` / `--eval-after`).

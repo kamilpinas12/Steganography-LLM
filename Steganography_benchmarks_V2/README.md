@@ -1,17 +1,17 @@
-# Benchmarki V2
+# Benchmarks V2
 
 ```
 Steganography_benchmarks_V2/
-  *.ipynb          # notebooki Colab/Kaggle
-  runs/            # wyjście generacji na platformie
-  scripts/         # kod Pythona (generate / evaluate)
-  results/         # lokalne runy + eksport CSV per benchmark
+  *.ipynb          # Colab / Kaggle notebooks
+  runs/            # generation output on the cloud platform
+  scripts/         # Python pipeline (generate / evaluate)
+  results/         # local runs + per-benchmark CSV export
 ```
 
-## Testy
+## Tests
 
-| Test | Generacja | Ewaluacja |
-|------|-----------|-----------|
+| Test | Generation | Evaluation |
+|------|------------|------------|
 | `humaneval` | GPU | CPU |
 | `capacity` | GPU | CPU |
 | `perplexity` | GPU | GPU |
@@ -21,18 +21,20 @@ Steganography_benchmarks_V2/
 
 ```bash
 python scripts/generate_responses.py --test capacity --model qwen --threshold 0.01 --platform kaggle
-python scripts/evaluate_responses.py --run-dir runs/NAZWA_RUNU
+python scripts/evaluate_responses.py --run-dir runs/RUN_NAME
 ```
 
-## Lokalne wyniki
+## Local results
 
-Skopiuj run do `results/<benchmark>/runs/`, potem:
+Copy a run into `results/<benchmark>/runs/`, then:
 
 ```bash
 cd results
+source .venv/bin/activate
+pip install -r requirements-gpu.txt   # from results/
 python run_evaluate.py --list
-python run_evaluate.py NAZWA_RUNU
+python run_evaluate.py RUN_NAME
 python humaneval/export_csv.py   # → humaneval/summary.csv
 ```
 
-Szczegóły: [`results/README.md`](results/README.md).
+Details: [`results/README.md`](results/README.md).

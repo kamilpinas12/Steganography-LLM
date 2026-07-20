@@ -1,4 +1,4 @@
-"""Rank-token steganografia LLM — enkoder i dekoder na liście ID tokenów."""
+"""Rank-token LLM steganography — encoder and decoder over token ID lists."""
 
 from __future__ import annotations
 
@@ -161,7 +161,7 @@ def encoder(
     top_n: int = 15,
     max_steps: int = 1000,
 ) -> EncodeResult:
-    """Ukryj bajty w wygenerowanym tekście. Na wejściu surowe `bytes` (np. po dekodowaniu hex)."""
+    """Embed bytes into generated text. Input is raw `bytes` (e.g. after hex decode)."""
     _init_prng(password)
 
     secret_bits = bytes_to_bits(secret + EOM_BYTE)
@@ -230,15 +230,15 @@ def decoder(
     threshold: float = 0.01,
     top_n: int = 15,
 ) -> bytes:
-    """Odtwórz bajty z listy ID tokenów niosących ukrytą wiadomość."""
+    """Recover bytes from the token ID list that carries the hidden message."""
     _init_prng(password)
 
     if len(context) < len(carrier_token_ids):
-        raise ValueError("context krótszy niż carrier_token_ids")
+        raise ValueError("context shorter than carrier_token_ids")
 
     prefix_len = len(context) - len(carrier_token_ids)
     if context[prefix_len:] != carrier_token_ids:
-        raise ValueError("carrier_token_ids musi być sufiksem context")
+        raise ValueError("carrier_token_ids must be a suffix of context")
 
     decoded_bits: list[int] = []
     eos_id = model.tokenizer.eos_token_id

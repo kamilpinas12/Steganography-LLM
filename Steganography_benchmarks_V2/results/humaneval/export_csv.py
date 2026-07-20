@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Zbiera wyniki HumanEval z runs/ do summary.csv (wszystkie pola skalarne)."""
+"""Collect HumanEval results from runs/ into summary.csv (all scalar fields)."""
 
 from pathlib import Path
 import sys

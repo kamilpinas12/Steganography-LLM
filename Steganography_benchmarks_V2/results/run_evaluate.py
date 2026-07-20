@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ewaluacja RAW runów z results/<benchmark>/runs/."""
+"""Evaluate RAW runs under results/<benchmark>/runs/."""
 
 from __future__ import annotations
 
@@ -42,7 +42,6 @@ def run_label(run_dir: Path) -> str:
 
 
 def resolve_run(run_arg: str) -> Path | None:
-    # results/humaneval/runs/NAME or humaneval/NAME or just NAME
     candidates = [
         (RESULTS_ROOT / run_arg).resolve(),
         (RESULTS_ROOT / "humaneval" / "runs" / run_arg).resolve(),
@@ -59,7 +58,10 @@ def resolve_run(run_arg: str) -> Path | None:
     if len(by_name) == 1:
         return by_name[0]
     if len(by_name) > 1:
-        print("Wiele runów o tej nazwie — podaj ścieżkę (np. humaneval/runs/...):", file=sys.stderr)
+        print(
+            "Multiple runs with that name — pass a path (e.g. humaneval/runs/...):",
+            file=sys.stderr,
+        )
         for r in by_name:
             print(f"  {run_label(r)}", file=sys.stderr)
         return None
@@ -71,10 +73,10 @@ def resolve_run(run_arg: str) -> Path | None:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Ewaluuj run z results/<benchmark>/runs/")
-    parser.add_argument("run", nargs="?", help="Nazwa runu lub ścieżka względem results/")
-    parser.add_argument("--list", action="store_true", help="Pokaż dostępne runy")
-    parser.add_argument("--all", action="store_true", help="Ewaluuj wszystkie runy")
+    parser = argparse.ArgumentParser(description="Evaluate a run from results/<benchmark>/runs/")
+    parser.add_argument("run", nargs="?", help="Run name or path relative to results/")
+    parser.add_argument("--list", action="store_true", help="List available runs")
+    parser.add_argument("--all", action="store_true", help="Evaluate all runs")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--workers", type=int, default=4)
     parser.add_argument("--timeout", type=float, default=3.0)
@@ -103,9 +105,9 @@ def main() -> int:
     if args.list:
         runs = discover_runs()
         if not runs:
-            print(f"Brak runów w {RESULTS_ROOT}/<benchmark>/runs/")
+            print(f"No runs under {RESULTS_ROOT}/<benchmark>/runs/")
             return 0
-        print(f"Runy w {RESULTS_ROOT}:\n")
+        print(f"Runs in {RESULTS_ROOT}:\n")
         for run_dir in runs:
             manifest = run_dir / "manifest.json"
             extra = ""
@@ -118,7 +120,7 @@ def main() -> int:
     if args.all:
         runs = discover_runs()
         if not runs:
-            print(f"Brak runów w {RESULTS_ROOT}/<benchmark>/runs/")
+            print(f"No runs under {RESULTS_ROOT}/<benchmark>/runs/")
             return 0
         failed = 0
         for run_dir in runs:
@@ -130,16 +132,16 @@ def main() -> int:
         return 1 if failed else 0
 
     if not args.run:
-        print("Podaj nazwę runu lub użyj --list", file=sys.stderr)
+        print("Pass a run name or use --list", file=sys.stderr)
         return 1
 
     run_dir = resolve_run(args.run)
     if run_dir is None:
-        print(f"Nie znaleziono runu: {args.run!r}", file=sys.stderr)
-        print("Użyj: python run_evaluate.py --list", file=sys.stderr)
+        print(f"Run not found: {args.run!r}", file=sys.stderr)
+        print("Use: python run_evaluate.py --list", file=sys.stderr)
         return 1
 
-    print(f"Ewaluacja: {run_dir}\n", flush=True)
+    print(f"Evaluating: {run_dir}\n", flush=True)
     return subprocess.run(eval_cmd(run_dir, args), cwd=str(SCRIPTS_DIR), check=False).returncode
 
 

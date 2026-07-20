@@ -1,17 +1,17 @@
-# Steganografia w LLM
+# LLM Steganography
 
-Ukrywanie sekretu w wyborze tokenów modelu językowego (rank-token steganografia): enkoder i dekoder dzielą hasło (PRNG), a po stronie sieci przesyłane są tylko ID tokenów.
+Hide a secret in LLM token choices (rank-token steganography): encoder and decoder share a password (PRNG). Only token IDs are sent over the network.
 
-## Struktura
+## Layout
 
-| Folder | Opis |
-|--------|------|
-| [`gui/`](gui/) | Demo UDP: klient + serwer (PyQt6) |
-| [`Steganography_benchmarks_V2/`](Steganography_benchmarks_V2/) | Benchmarki (notebooki + `scripts/` + `results/`) |
+| Folder | Description |
+|--------|-------------|
+| [`gui/`](gui/) | UDP demo: client + server (PyQt6) |
+| [`Steganography_benchmarks_V2/`](Steganography_benchmarks_V2/) | Benchmarks (notebooks + `scripts/` + `results/`) |
 
-Modele Hugging Face cache’owane lokalnie w `models/` (gitignored).
+Hugging Face models are cached under `models/` (gitignored).
 
-## Szybki start — GUI
+## Quick start — GUI
 
 ```bash
 cd gui
@@ -20,7 +20,7 @@ python gui_server.py   # terminal 1
 python gui_client.py   # terminal 2
 ```
 
-## Szybki start — benchmarki
+## Quick start — benchmarks
 
-Zobacz [`Steganography_benchmarks_V2/README.md`](Steganography_benchmarks_V2/README.md).
-Wyniki: `Steganography_benchmarks_V2/results/<benchmark>/`.
+See [`Steganography_benchmarks_V2/README.md`](Steganography_benchmarks_V2/README.md).
+Results live under `Steganography_benchmarks_V2/results/<benchmark>/`.

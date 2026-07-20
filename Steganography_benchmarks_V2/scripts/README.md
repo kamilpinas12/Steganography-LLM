@@ -1,5 +1,5 @@
-# Kod pipeline’u
+# Pipeline scripts
 
-Skrypty generacji i ewaluacji. Notebooki w katalogu wyżej wołają je jako `python scripts/...`.
+Generation and evaluation code. Notebooks in the parent directory call them as `python scripts/...`.
 
-Główne wejścia: `generate_responses.py`, `evaluate_responses.py`.
+Main entry points: `generate_responses.py`, `evaluate_responses.py`.
