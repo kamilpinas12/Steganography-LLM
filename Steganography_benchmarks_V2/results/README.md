@@ -37,7 +37,8 @@ pip install -r ../scripts/requirements.txt
 2. `python run_evaluate.py RUN_NAME` (if `evaluation/` is missing)
 3. `python <benchmark>/export_csv.py`
 
-CSV columns: run parameters + metrics (flattened, no prefixes). Sample lists stay in JSON.
+CSV keeps analysis columns: model params (`model`, `threshold`, `top_n`, …) + metrics.
+Dropped noise: timestamps, platform, status/phase, `inferred`, task-id lists. Full details stay in run JSON.
 
 ## Perplexity (missing evaluation)
 

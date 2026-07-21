@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Collect capacity results from runs/ into summary.csv (all scalar fields)."""
+"""Export capacity summary.csv (analysis columns only)."""
 
 from pathlib import Path
 import sys
@@ -14,4 +14,5 @@ if __name__ == "__main__":
         runs_dir=HERE / "runs",
         out_csv=HERE / "summary.csv",
         results_filename="capacity_results.json",
+        benchmark="capacity",
     )
